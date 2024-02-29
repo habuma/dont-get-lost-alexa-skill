@@ -1,3 +1,8 @@
+/* *
+ * This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
+ * Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
+ * session persistence, api calls, and more.
+ * */
 const Alexa = require('ask-sdk-core');
 
 const LaunchRequestHandler = {
@@ -5,7 +10,7 @@ const LaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const speakOutput = 'Welcome, you can say Hello or Help. Which would you like to try?';
+        const speakOutput = 'Welcome! I can help you find out where you are. How can I help?';
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -14,6 +19,8 @@ const LaunchRequestHandler = {
     }
 };
 
+const round = (n, p = 2) => 
+    (e => Math.round(n * e) / e)(Math.pow(10, p));
 
 const WhereAmIIntentHandler = {
   canHandle(handlerInput) {
@@ -30,10 +37,9 @@ const WhereAmIIntentHandler = {
     if (isGeoSupported ) {
         if (context.Geolocation && context.Geolocation.coordinate) {
             const coordinates = context.Geolocation.coordinate;
-            const latitude = coordinates.latitudeInDegrees;
-            const longitude = coordinates.longitudeInDegrees;
-    
-            speakOutput = 'You are at latitude ' + latitude + ' and longitude ' + longitude;
+            const latitude = round(coordinates.latitudeInDegrees);
+            const longitude = round(coordinates.longitudeInDegrees);
+            speakOutput = 'You are approximately at latitude ' + latitude + ' and longitude ' + longitude;
         } else {
             // If geo-location info isn't in the request, then
             // you probably need to ask permission
@@ -163,6 +169,8 @@ const ErrorHandler = {
     handle(handlerInput, error) {
         const speakOutput = 'Sorry, I had trouble doing what you asked. Please try again.';
         console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
+        console.log(error);
+        
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
